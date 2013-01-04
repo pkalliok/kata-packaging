@@ -116,7 +116,7 @@ essential to the installation. The spec file resides in rpms/solr.
 Building it is straightforward, assuming one has a development machine 1 primed
 for building RPM packages from source. We just need to download a binary
 distribution of SOLR to ~/rpmbuild/SOURCES:
- http://archive.apache.org/dist/lucene/solr/3.5.0/apache-solr-3.5.0.tgz
+ http://archive.apache.org/dist/lucene/solr/4.0.0/apache-solr-4.0.0.tgz
 
 $ curl -O http://archive.apache.org/dist/lucene/solr/3.5.0/apache-solr-3.5.0.tgz
 $ mv apache-solr-3.5.0.tgz ~/rpmbuild/SOURCES/
