@@ -118,8 +118,8 @@ for building RPM packages from source. We just need to download a binary
 distribution of SOLR to ~/rpmbuild/SOURCES:
  http://archive.apache.org/dist/lucene/solr/4.0.0/apache-solr-4.0.0.tgz
 
-$ curl -O http://archive.apache.org/dist/lucene/solr/3.5.0/apache-solr-3.5.0.tgz
-$ mv apache-solr-3.5.0.tgz ~/rpmbuild/SOURCES/
+$ curl -O http://archive.apache.org/dist/lucene/solr/4.0.0/apache-solr-4.0.0.tgz
+$ mv apache-solr-4.0.0.tgz ~/rpmbuild/SOURCES/
 
 And then issuing the rpmbuild command (never build as root)
 
@@ -130,7 +130,7 @@ The result will be in ~/rpmbuild/RPMS/x86_64
 The installation is done using command (yes, we need this package on the
 development machine already)
 
-$ sudo yum install ~/rpmbuild/RPMS/x86_64/apache-solr-3.5.0-1.el6.x86_64.rpm
+$ sudo yum install ~/rpmbuild/RPMS/x86_64/apache-solr-4.0.0-1.el6.x86_64.rpm
 
 
 IV.  Building and installation of mcfg
