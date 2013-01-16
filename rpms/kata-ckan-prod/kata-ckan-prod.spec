@@ -53,10 +53,11 @@ This package is for the production server.
 diff -u patches/orig/attribute-map.xml patches/kata/attribute-map.xml >attribute-map.xml.patch || true
 diff -u patches/orig/attribute-policy.xml patches/kata/attribute-policy.xml >attribute-policy.xml.patch || true
 diff -u patches/orig/httpd.conf patches/kata/httpd.conf >httpd.conf.patch || true
-diff -u patches/orig/ssl.conf patches/kata/ssl.conf >ssl.conf.patch || true
 diff -u patches/orig/pg_hba.conf patches/kata/pg_hba.conf >pg_hba.conf.patch || true
 diff -u patches/orig/shib.conf patches/kata/shib.conf >shib.conf.patch || true
 diff -u patches/orig/shibboleth2.xml patches/kata/shibboleth2.xml >shibboleth2.xml.patch || true
+diff -u patches/orig/solr.xml patches/kata/solr.xml >solr.xml.patch || true
+diff -u patches/orig/ssl.conf patches/kata/ssl.conf >ssl.conf.patch || true
 diff -u patches/orig/tomcat6.conf patches/kata/tomcat6.conf >tomcat6.conf.patch || true
 
 
@@ -110,6 +111,7 @@ install httpd.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install pg_hba.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install shib.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install shibboleth2.xml.patch $RPM_BUILD_ROOT/%{patchdir}/
+install solr.xml.patch $RPM_BUILD_ROOT/%{patchdir}/
 install ssl.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install tomcat6.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 
@@ -155,6 +157,7 @@ rm -rf $RPM_BUILD_ROOT
 %{patchdir}/attribute-policy.xml.patch
 %{patchdir}/shib.conf.patch
 %{patchdir}/shibboleth2.xml.patch
+%{patchdir}/solr.xml.patch
 %{patchdir}/ssl.conf.patch
 %{patchdir}/tomcat6.conf.patch
 
@@ -168,7 +171,7 @@ useradd %{ckanuser}  # needs to be removed if ckanuser were changed to httpd
 %{scriptdir}/04configuredependencies.sh %{patchdir}
 %{scriptdir}/16configshibbolethsp.sh "/usr/share/kata-ckan-prod"
 %{scriptdir}/20setuppostgres.sh %{patchdir}
-%{scriptdir}/22configsolr.sh /home/%{ckanuser}
+%{scriptdir}/22configsolr.sh /home/%{ckanuser} %{patchdir}
 %{scriptdir}/24setupapachessl.sh "/usr/share/kata-ckan-prod"
 su -c "%{scriptdir}/30setupckanprod.sh /home/%{ckanuser}" %{ckanuser}
 %{scriptdir}/31setupckan-root.sh %{ckanuser}

@@ -33,7 +33,7 @@ EOF
 
 %post
 # To counter the issues with a 500 error on solr.
-sed -i 's/enable="${solr.velocity.enabled:true}"/enable="${solr.velocity.enabled:false}"/' /opt/data/solr/conf/solrconfig.xml
+sed -i 's/enable="${solr.velocity.enabled:true}"/enable="${solr.velocity.enabled:false}"/' /opt/data/solr/collection1/conf/solrconfig.xml
 service tomcat6 restart
 %files
 %attr(-,tomcat,tomcat)/opt/data/solr
