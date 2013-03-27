@@ -1,1 +1,0 @@
-../../common/31setupckan-root.sh

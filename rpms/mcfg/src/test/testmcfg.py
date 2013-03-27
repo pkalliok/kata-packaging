@@ -9,6 +9,10 @@ import unittest
 # we live in subdirectory test, so we need to import the code to be tested
 # from the parent directory. I don't like this hack, please suggest something
 # better (well, nose does it already, but maybe not everybody uses it)
+#
+# better suggestion: http://docs.python.org/2/whatsnew/2.5.html
+# see section "PEP 328: Absolute and Relative Imports", relative imports
+# never touch a working code, so not implemented now
 here = os.path.split(__file__)[0]
 if here == '' :
     here = os.getcwd()
@@ -31,7 +35,7 @@ class TestMcfg(unittest.TestCase):
         """test a good value"""
         (incr, param) = mcfg.Mcfg.parsevalue("27 foo")
         self.assertEqual(27, incr)
-        self.assertEqual("foo", param) 
+        self.assertEqual("foo", param)
 
     def test_parsevalue_no_space(self):
         """test a value that contains no space"""
@@ -44,7 +48,7 @@ class TestMcfg(unittest.TestCase):
         try:
             mcfg.Mcfg.parsevalue(testvalue)
         except ValueError as exc:
-            self.assertEqual( "Increment value must be separated from " 
+            self.assertEqual( "Increment value must be separated from "
                   "editor name by space: {0}".format(testvalue), str(exc))
 
 
@@ -56,7 +60,7 @@ class TestMcfg(unittest.TestCase):
         try:
             mcfg.Mcfg.parsevalue(testvalue)
         except ValueError as exc:
-            self.assertEqual( "Increment value must numeric: >>>foo<<< bar", 
+            self.assertEqual( "Increment value must numeric: >>>foo<<< bar",
                              str(exc))
 
 
@@ -98,14 +102,14 @@ class TestMcfg(unittest.TestCase):
         thisincr.__int__ = mock.Mock()
         thisincr.__int__.return_value = 99
         testmcfg.run_editors(thisincr)
-        
+
         result = filecmp.cmp(expected_ckan, target_ckan)
         if result:
             os.unlink(target_ckan)
         else:
             print >> sys.stderr, "incorrect output {0}".format(target_ckan)
         self.assertTrue(result)
-        
+
         backup = "{0}.backup.{1}".format(target_ckan, int(thisincr))
         result = filecmp.cmp(testin_ckan, backup)
         if result:
@@ -113,7 +117,7 @@ class TestMcfg(unittest.TestCase):
         else:
             print >> sys.stderr, "incorrect output {0}".format(backup)
         self.assertTrue(result)
-        
+
         result = filecmp.cmp(expected_haka, target_haka)
         if result:
             os.unlink(target_haka)
@@ -128,13 +132,13 @@ class TestMcfg(unittest.TestCase):
         else:
             print >> sys.stderr, "incorrect output {0}".format(backup)
         self.assertTrue(result)
-        
+
         self.assertTrue(filecmp.cmp(testin_cert, target_cert))
         os.unlink(target_cert)
         os.unlink(input_cert)
 
 
-        
+
 
 
 if __name__ == '__main__':

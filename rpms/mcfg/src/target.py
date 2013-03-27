@@ -1,6 +1,6 @@
 """This module contains only the class Target"""
 
-import itertools
+import logging
 import os
 import os.path
 import shutil
@@ -39,19 +39,26 @@ class Target:
             raise ValueError, "template error: no mcfg_filename"
         backup = self.backup()
         incr_edlist = filter( incr.is_current, self.edlist)
-        if backup:
-            # don't follow symbolic links, maybe not so much a
-            # security issue here, but can at least cause confusion
-            if not (os.path.exists(self.targetfile) and
-                    os.path.isfile(self.targetfile) and
-                    not os.path.islink(self.targetfile)):
-                raise IOError, "Target file {0} does not exist or is not " \
-                                 "a regular file".format(self.targetfile)
-        else:
-            if len(incr_edlist) > 0 and os.path.exists(self.targetfile):
+
+        logging.debug("Target.run_editors, target file: %s, incr: %s",
+                      self.targetfile , incr.incr)
+        if len(incr_edlist) > 0:
+            for (num, edi) in enumerate(incr_edlist, 1):
+                logging.debug( "   %d: %s" , num , edi.name )
+            if backup:
+                # don't follow symbolic links, maybe not so much a
+                # security issue here, but can at least cause confusion
+                if not (os.path.exists(self.targetfile) and
+                        os.path.isfile(self.targetfile) and
+                        not os.path.islink(self.targetfile)):
+                    raise IOError, "Target file {0} does not exist or is not " \
+                                     "a regular file".format(self.targetfile)
+            elif os.path.exists(self.targetfile):
                 raise IOError, "Target file {0} already exists".format(
-                                 self.targetfile)
-        for (num, edi) in itertools.imap(None, itertools.count(1), incr_edlist):
+                                self.targetfile)
+        else:
+            logging.debug("   x: (no editors in this increment)")
+        for (num, edi) in enumerate(incr_edlist, 1):
             in_file = None
             if backup:
                 in_file = "{0}.backup.{1}".format(self.targetfile, int(incr))

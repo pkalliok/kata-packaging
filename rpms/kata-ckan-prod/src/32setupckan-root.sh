@@ -1,0 +1,1 @@
+../../common/32setupckan-root.sh

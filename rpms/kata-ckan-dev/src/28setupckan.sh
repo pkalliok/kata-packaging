@@ -26,14 +26,3 @@ patch -b -p2 -i /usr/share/kata-ckan-dev/setup-patches/development.ini.patch
 mv development.ini development.ini.patched
 sed -e "/%%GENERATED%%/ r /tmp/development.ini.generated-only" -e "/%%GENERATED%%/ d" development.ini.patched > development.ini
 # patching done...
-
-myipcmd=$(dirname $0)/myip.sh
-myip=$($myipcmd)
-# TODO: needs to be really configurable
-ckanusermail=root@localhost
-sed -e "s/%%myip%%/${myip}/" -e "s/%%ckanusermail%%/${ckanusermail}/" development.ini > development.ini.1
-mv development.ini.1 development.ini
-if [ \! -e /tmp/kata-SKIP-dbinit ]
-then
-  paster --plugin=ckan db init
-fi

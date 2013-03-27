@@ -7,6 +7,10 @@ import unittest
 # we live in subdirectory test, so we need to import the code to be tested
 # from the parent directory. I don't like this hack, please suggest something
 # better (well, nose does it already, but maybe not everybody uses it)
+#
+# better suggestion: http://docs.python.org/2/whatsnew/2.5.html
+# see section "PEP 328: Absolute and Relative Imports", relative imports
+# never touch a working code, so not implemented now
 here=os.path.split( __file__ )[0]
 if here == '' :
   here = os.getcwd()

@@ -18,10 +18,12 @@ License: AGPLv3+
 #Url: http://not.sure.yet
 Source: kata-ckan-prod-%{version}.tgz
 Requires: apache-solr
+Requires: catdoc
 Requires: libxslt
 Requires: mcfg
 Requires: mod_wsgi
 Requires: mod_ssl
+Requires: odt2txt
 Requires: patch
 Requires: policycoreutils-python
 Requires: postgresql
@@ -29,6 +31,7 @@ Requires: postgresql-server
 Requires: rabbitmq-server
 Requires: shibboleth
 Requires: supervisor
+Requires: w3m
 Conflicts: kata-ckan-dev
 BuildRequires: kata-ckan-dev
 # Fedora documentation says one should use...
@@ -54,6 +57,7 @@ diff -u patches/orig/attribute-map.xml patches/kata/attribute-map.xml >attribute
 diff -u patches/orig/attribute-policy.xml patches/kata/attribute-policy.xml >attribute-policy.xml.patch || true
 diff -u patches/orig/httpd.conf patches/kata/httpd.conf >httpd.conf.patch || true
 diff -u patches/orig/pg_hba.conf patches/kata/pg_hba.conf >pg_hba.conf.patch || true
+diff -u patches/orig/postgresql.conf patches/kata/postgresql.conf >postgresql.conf.patch || true
 diff -u patches/orig/shib.conf patches/kata/shib.conf >shib.conf.patch || true
 diff -u patches/orig/shibboleth2.xml patches/kata/shibboleth2.xml >shibboleth2.xml.patch || true
 diff -u patches/orig/solr.xml patches/kata/solr.xml >solr.xml.patch || true
@@ -77,7 +81,14 @@ sudo find /home/%{ckanuser}/pyenv -depth | sudo cpio -pdm --owner ${me}: $RPM_BU
 sudo chown ${me} $RPM_BUILD_ROOT/home
 sudo chown ${me} $RPM_BUILD_ROOT/home/%{ckanuser}
 find $RPM_BUILD_ROOT/home/%{ckanuser} -name .git -print0 | xargs -0 rm -rf
+find $RPM_BUILD_ROOT/home/%{ckanuser} -name .gitignore -print0 | xargs -0 rm -f
 find $RPM_BUILD_ROOT/home/%{ckanuser} -name .svn -print0 | xargs -0 rm -rf
+find $RPM_BUILD_ROOT/home/%{ckanuser} -name .bzr -print0 | xargs -0 rm -rf
+find $RPM_BUILD_ROOT/home/%{ckanuser} -name .bzrignore -print0 | xargs -0 rm -f
+
+# Remove the symlink to orange and actually copy the file over
+rm $RPM_BUILD_ROOT/home/%{ckanuser}/pyenv/lib/python2.6/site-packages/Orange/liborange.so
+cp $RPM_BUILD_ROOT/home/%{ckanuser}/pyenv/lib/python2.6/site-packages/Orange/orange.so $RPM_BUILD_ROOT/home/%{ckanuser}/pyenv/lib/python2.6/site-packages/Orange/liborange.so
 
 install -d $RPM_BUILD_ROOT/%{scriptdir}
 install -d $RPM_BUILD_ROOT/%{patchdir}
@@ -95,20 +106,20 @@ install 16configshibbolethsp.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 20setuppostgres.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 22configsolr.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 24setupapachessl.sh $RPM_BUILD_ROOT/%{scriptdir}/
-install 30setupckanprod.sh $RPM_BUILD_ROOT/%{scriptdir}/
-install 31setupckan-root.sh $RPM_BUILD_ROOT/%{scriptdir}/
-install 32setupapache.sh $RPM_BUILD_ROOT/%{scriptdir}/
-install 35setupharvester.sh $RPM_BUILD_ROOT/%{scriptdir}/
+install 32setupckan-root.sh $RPM_BUILD_ROOT/%{scriptdir}/
+install 36initckandb.sh $RPM_BUILD_ROOT/%{scriptdir}/
+install 40setupapache.sh $RPM_BUILD_ROOT/%{scriptdir}/
+install 48initextensionsdb.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 61setupsources.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 80backuphome.sh $RPM_BUILD_ROOT/%{scriptdir}/
 # misc scripts (keep them alphabetically ordered by filename)
-install myip.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install runharvester.sh $RPM_BUILD_ROOT/%{scriptdir}/
 # patches (keep them alphabetically ordered by filename)
 install attribute-map.xml.patch $RPM_BUILD_ROOT/%{patchdir}/
 install attribute-policy.xml.patch $RPM_BUILD_ROOT/%{patchdir}/
 install httpd.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install pg_hba.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
+install postgresql.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install shib.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install shibboleth2.xml.patch $RPM_BUILD_ROOT/%{patchdir}/
 install solr.xml.patch $RPM_BUILD_ROOT/%{patchdir}/
@@ -116,8 +127,10 @@ install ssl.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 install tomcat6.conf.patch $RPM_BUILD_ROOT/%{patchdir}/
 
 # misc data/conf files (keep them alphabetically ordered by filename)
+install kataemail $RPM_BUILD_ROOT/etc/cron.daily/
 install kataharvesterjobs $RPM_BUILD_ROOT/etc/cron.daily/
 install kataindex $RPM_BUILD_ROOT/etc/cron.hourly/
+install katatracking $RPM_BUILD_ROOT/etc/cron.daily/
 install harvester.conf $RPM_BUILD_ROOT/%{scriptdir}/
 install kata.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/
 install postgresql $RPM_BUILD_ROOT/etc/sysconfig/pgsql/
@@ -137,18 +150,20 @@ rm -rf $RPM_BUILD_ROOT
 %{scriptdir}/20setuppostgres.sh
 %{scriptdir}/22configsolr.sh
 %{scriptdir}/24setupapachessl.sh
-%{scriptdir}/30setupckanprod.sh
-%{scriptdir}/31setupckan-root.sh
-%{scriptdir}/32setupapache.sh
-%{scriptdir}/35setupharvester.sh
+%{scriptdir}/32setupckan-root.sh
+%{scriptdir}/36initckandb.sh
+%{scriptdir}/40setupapache.sh
+%{scriptdir}/48initextensionsdb.sh
 %{scriptdir}/61setupsources.sh
 %{scriptdir}/80backuphome.sh
-%{scriptdir}/myip.sh
 %{scriptdir}/runharvester.sh
 %{patchdir}/httpd.conf.patch
 %{patchdir}/pg_hba.conf.patch
+%{patchdir}/postgresql.conf.patch
 %attr(0655,root,root)/etc/cron.hourly/kataindex
+%attr(0655,root,root)/etc/cron.daily/kataemail
 %attr(0655,root,root)/etc/cron.daily/kataharvesterjobs
+%attr(0655,root,root)/etc/cron.daily/katatracking
 %{scriptdir}/harvester.conf
 /etc/httpd/conf.d/kata.conf
 /etc/sysconfig/pgsql/postgresql
@@ -173,10 +188,10 @@ useradd %{ckanuser}  # needs to be removed if ckanuser were changed to httpd
 %{scriptdir}/20setuppostgres.sh %{patchdir}
 %{scriptdir}/22configsolr.sh /home/%{ckanuser} %{patchdir}
 %{scriptdir}/24setupapachessl.sh "/usr/share/kata-ckan-prod"
-su -c "%{scriptdir}/30setupckanprod.sh /home/%{ckanuser}" %{ckanuser}
-%{scriptdir}/31setupckan-root.sh %{ckanuser}
-%{scriptdir}/32setupapache.sh %{patchdir}
-su -c "%{scriptdir}/35setupharvester.sh /home/%{ckanuser}" %{ckanuser}
+%{scriptdir}/32setupckan-root.sh %{ckanuser}
+su -c "%{scriptdir}/36initckandb.sh /home/%{ckanuser}" %{ckanuser}
+%{scriptdir}/40setupapache.sh %{patchdir}
+su -c "%{scriptdir}/48initextensionsdb.sh /home/%{ckanuser}" %{ckanuser}
 
 # Lets do this last so our harvesters are correctly picked up by the daemons.
 cat /usr/share/kata-ckan-prod/setup-scripts/harvester.conf >> /etc/supervisord.conf
@@ -190,9 +205,7 @@ at -f %{scriptdir}/runharvester.sh 'now + 3 minute'
 service shibd start
 service httpd start
 service supervisord start
-# Pick up the cron job that was installed. (for unknown reasons cron
-# did not do it automatically)
-service crond reload
+service crond start
 
 
 %preun

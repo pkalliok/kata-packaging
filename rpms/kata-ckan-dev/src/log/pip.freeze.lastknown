@@ -6,11 +6,13 @@ Genshi==0.6
 Jinja2==2.6
 Mako==0.7.3
 MarkupSafe==0.15
+Orange==2.6
+Orange-Text==1.2a1
 Pairtree==0.7.1-T
 Paste==1.7.5.1
 PasteDeploy==1.5.0
 PasteScript==1.7.5
-Pygments==1.5
+Pygments==1.6
 Pylons==0.9.7
 Routes==1.13
 SQLAlchemy==0.7.8
@@ -18,45 +20,49 @@ Tempita==0.5.1
 WebError==0.10.3
 WebHelpers==1.3
 WebOb==1.0.8
-WebTest==1.4.3
+WebTest==2.0
 amqplib==1.0.2
 anyjson==0.3.3
 apachemiddleware==0.1.1
 argparse==1.2.1
-beautifulsoup4==4.1.3
+-e bzr+http://bazaar.launchpad.net/~leonardr/beautifulsoup/bs4/@268#egg=beautifulsoup4-4.1.3-py2.6-dev_r268
 carrot==0.10.7
--e git+https://github.com/kata-csc/ckan.git@de56244b319cef111f219683ad69bc7d5d688144#egg=ckan-dev
+-e git+https://github.com/kata-csc/ckan.git@c2dd5e7e9b670d02b3711139b8acab3325753fbf#egg=ckan-dev
 ckanclient==0.10
--e git+https://github.com/kata-csc/ckanext-ddi.git@9be6e8b47213e0ff892fdba93b2da808600f3362#egg=ckanext_ddi-dev
--e git+https://github.com/kata-csc/ckanext-harvest.git@0bc30cce3247c449f7e6633f23e18d1362424044#egg=ckanext_harvest-dev
--e git://github.com/kata-csc/ckanext-kata.git@4fba19fe0388ef20db3f3cd7e8ab32db3518e9ce#egg=ckanext_kata-dev
--e git+https://github.com/kata-csc/ckanext-oaipmh.git@2c94c63f8a3098f021b74fc231d4a296373bebd2#egg=ckanext_oaipmh-dev
--e git://github.com/kata-csc/ckanext-shibboleth.git@40511ee3c1166d06364a7164229cc6043ca4787b#egg=ckanext_repoze_who_shibboleth-dev
+-e git+https://github.com/kata-csc/ckanext-ddi.git@b3fb02a1c5a0d87d55365a68304893f326a201ed#egg=ckanext_ddi-dev
+-e git+https://github.com/kata-csc/ckanext-harvest.git@eda0ab77e1cb2ab92ac374f7904e48a2e2411348#egg=ckanext_harvest-dev
+-e git://github.com/kata-csc/ckanext-kata.git@1aa6e315d4e49c871ef959b46627684028fadab1#egg=ckanext_kata-dev
+-e git+https://github.com/kata-csc/ckanext-oaipmh.git@603c5e48f0ad44cbdd31642a3727f73c2518d8e6#egg=ckanext_oaipmh-dev
+-e git://github.com/kata-csc/ckanext-shibboleth.git@cf9332e58c31dd7b25418d536ffbd160d06e86aa#egg=ckanext_repoze_who_shibboleth-dev
 -e git+https://github.com/kata-csc/ckanext-sitemap.git@1df31049473a7bd6f82967a5a9de8b93d8cc0616#egg=ckanext_sitemap-dev
 -e git+https://github.com/kata-csc/ckanext-urn.git@b48dfffb0f327aaaf21664ec0057f137ab58ce41#egg=ckanext_urn-dev
 decorator==3.4.0
 fanstatic==0.12
+html5lib==0.95
 iso8601==0.1.4
 isodate==0.4.9
-lxml==3.0.2
+lxml==3.1.0
 nose==1.2.1
+numpy==1.7.0
 ofs==0.4.1
+ordereddict==1.1
 psycopg2==2.4.5
-pycountry==0.14.7
+pycountry==0.14.8
 pyoai==2.4.4
 python-dateutil==2.1
 python-openid==2.2.5
 pyutilib.component.core==4.5.3
-rdflib==3.2.3
+rdflib==3.4.0
 repoze.lru==0.6
 repoze.who==1.0.19
 repoze.who-friendlyform==1.0.8
 repoze.who.plugins.openid==0.5.3
 requests==0.14.0
-simplejson==2.6.2
+simplejson==3.1.0
 six==1.2.0
 solrpy==0.9.5
 sqlalchemy-migrate==0.7.2
 unicodecsv==0.9.0
 -e git+https://github.com/okfn/vdm.git@0554de48c6d62d152699b53b98a7589dd5c71940#egg=vdm-dev
+waitress==0.8.2
 zope.interface==4.0.1

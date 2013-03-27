@@ -10,6 +10,12 @@ instructions below.
 No changes have happened in apache-solr, so this package does not
 need to be uninstalled, upgraded or reinstalled.
 
+As always in before bigger administration works, make sure you have a
+complete and valid backup, peferably on a seperate storage medium that
+is not mounted during backup. Most commands during the upgrade are
+executed as root, a simple typo or some unknown software bug has the
+potential to lead to fatal data loss.
+
 
 1.) Clear the search index
 
@@ -26,8 +32,7 @@ $ sudo service rabbitmq-server stop
 $ sudo -s -u ckan
 $ cd
 $ source pyenv/bin/active
-$ cd pyenv/src/ckan
-$ paster --plugin=ckan search-index clear --config=development.ini
+$ paster --plugin=ckan search-index clear --config=/etc/kata.ini
 $ exit                               (exit from previous sudo)
 
 TODO: if we really need this step, above commands should be added
@@ -58,7 +63,8 @@ the appropriate "git rm" commands should be given instead)
 (same idea as with supervisor)
 
 $ sudo yum remove shibboleth
-$ sudo rm -r /etc/shibboleth
+$ sudo rm -r /etc/shibboleth [1]
+
 
 
 5.) Uninstallation of apache
@@ -66,18 +72,18 @@ $ sudo rm -r /etc/shibboleth
 (same idea as with supervisor)
 
 $ sudo yum remove httpd
-$ sudo rm -r /etc/httpd
+$ sudo rm -r /etc/httpd [1]
 
 
 6.) Clean-up rabbitmq
 
-$ sudo rm -rf /var/lib/rabbitmq/* 
+Currently no actions needed.
 
-TODO: It appears that rabbitmq will recreate this
-properly when started again. If there are problems it might be
-necessary to uninstall the package. (If there are severe problems
-older versions of this document contain more debugging info, but currently
-I assume that is not needed)
+(Only needed when message format has changed or major upgrade to
+rabbitmq configuration (has never happened). See git history for steps
+we have carried out before. One needs to make sure that no important
+messages (e.g harvester fetch messages) are in the queue if the queue
+is flushed.)
 
 
 7.) Install the new packages
@@ -88,3 +94,22 @@ Follow the steps
 - install KATA
 
 as documented in the INSTALL document.
+
+
+
+[1] If etckeeper is in use removing configuration files should take
+this into accout. Although etckeeper usage is beyond of the scope of
+this document here the commands the author uses with for cleaning up after
+package removal when etckeeper with git is in use:
+
+# cd /etc
+# find . -name \*.rpmsave | xargs rm
+                   (by etckeeper default rpmsave files are gitignored)
+# find httpd/ -type f | xargs git rm
+# find shibboleth/ -type f | xargs git rm
+# git commit -a -m "manually removed remaining kata configurations as documented in UPGRADE"
+
+(Probably strictly speaking the manual git operations would not even
+be required. Etckeeper pre-yum hook should do the same after just plain
+rm commands have been used as listed in the main instruction list
+above. However, the author found the explicit operation somewhat clearer.)

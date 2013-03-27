@@ -1,19 +1,15 @@
 #! /bin/sh
 set -x
-if [ -f /tmp/kata-SKIP32 ]
+if [ -f /tmp/kata-SKIP40 ]
 then
-  echo "Skipping 32"
+  echo "Skipping 40"
   exit 0
 fi
 patchdir="$1"
 service httpd stop
 pushd /etc/httpd/conf >/dev/null
 patch -b -p2 -i ${patchdir}/httpd.conf.patch
-mv httpd.conf httpd.conf.step1
-myipcmd=$(dirname $0)/myip.sh
-myip=$($myipcmd)
-sed -e "s/%%MYIP%%/${myip}/" httpd.conf.step1 > httpd.conf
-/usr/bin/python /usr/share/mcfg/tool/mcfg.py run /usr/share/mcfg/config/kata-template.ini /root/kata-master.ini 32
+python /usr/share/mcfg/tool/mcfg.py run /usr/share/mcfg/config/kata-template.ini /root/kata-master.ini 40
 popd >/dev/null
 chkconfig httpd on
 chown -R ckan:apache /home/ckan/pyenv
@@ -27,7 +23,9 @@ chown ckan:apache /home/ckan/pyenv/ckan.log
 chmod g+w /home/ckan/pyenv/ckan.log
 chown -R ckan:apache /opt/data/ckan
 chcon -R --type=httpd_sys_content_t /opt/data/ckan
-chmod -R g+w /opt/data/ckan/{data,sstore}
+chmod -R g+w /opt/data/ckan/{data,sstore,data_tree}
+mkdir /var/www/.orange
+chown apache:apache /var/www/.orange
 # TODO: We should not hack other packages' files
 # what will happen when Python gets a security update???
 # well, as long as we do it only in dev it doesn't matter, because

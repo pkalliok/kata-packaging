@@ -1,7 +1,9 @@
-"""Usage: mcfg.py <operation> <template.ini> <master.ini> [<increment>]
+"""Usage: 1.) mcfg.py <operation> <template.ini> <master.ini> [<increment>]
        - operation can be either verify or run
        - increment is mandatory for run, optional (and ignored if present)
          for verify
+      or: 2.) mcfg.py switchuser <old> <new>
+       - where old and new are the respective user ids
 """
 
 import ConfigParser
@@ -15,6 +17,7 @@ import target
 
 RUN = 1
 VERIFY = 2
+SWITCHUSER = 3
 
 class Mcfg:
     """All functionality related to ini files and overall flow control
@@ -99,6 +102,8 @@ class Mcfg:
                     result = 2
         elif "verify".startswith(args[1]):
             operation = VERIFY
+        elif "switchuser".startswith(args[1]):
+            operation = SWITCHUSER
         else:
             result = 2
         if result != 2:
@@ -106,6 +111,8 @@ class Mcfg:
                 master = Mcfg( args[2] , args[3])
                 incr = incremental.Incremental(run_incr)
                 master.run_editors(incr)
+            elif operation == SWITCHUSER:
+                incremental.Incremental.copy_stat_file(args[2], args[3])
             else:
                 raise NotImplementedError, "verify"
         else:

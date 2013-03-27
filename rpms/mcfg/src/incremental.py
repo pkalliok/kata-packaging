@@ -68,11 +68,23 @@ class Incremental:
         stat.close()
 
     @staticmethod
-    def get_stat_file_name():
+    def get_stat_file_name(user = pwd.getpwuid(os.getuid()).pw_name):
         """Returns name of the file used to the store the last increment"""
         # this method can be called by unitttests to manipulate the status
-        return "/tmp/{0}-incremental".format(
-            pwd.getpwuid(os.getuid()).pw_name)
+        return "/tmp/{0}-incremental".format(user)
+
+    @staticmethod
+    def copy_stat_file(old_user, new_user) :
+        """Copy the stat file in preparation of a different user continuing
+        the current sequence. This should be done as the new user in order
+        the get write access right (of course it will fail if the new
+        user has no read access to the old file)"""
+        old_file = Incremental.get_stat_file_name(old_user)
+        new_file = Incremental.get_stat_file_name(new_user)
+        cmd = "cp {0} {1}".format( old_file, new_file )
+        ret = os.system(cmd)
+        if ret != 0 :
+            raise IOError, "Problem executing {0}".format(cmd)
 
     def __int__(self):
         """Magic function convert to integer.

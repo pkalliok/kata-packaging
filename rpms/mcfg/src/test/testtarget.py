@@ -11,6 +11,10 @@ import unittest
 # we live in subdirectory test, so we need to import the code to be tested
 # from the parent directory. I don't like this hack, please suggest something
 # better (well, nose does it already, but maybe not everybody uses it)
+#
+# better suggestion: http://docs.python.org/2/whatsnew/2.5.html
+# see section "PEP 328: Absolute and Relative Imports", relative imports
+# never touch a working code, so not implemented now
 here = os.path.split(__file__)[0]
 if here == '' :
     here = os.getcwd()
@@ -20,6 +24,7 @@ hacked_path.extend(sys.path)
 sys.path = hacked_path
 
 import editor
+import mcfg
 import target
 
 class TestTarget(unittest.TestCase):
@@ -29,6 +34,7 @@ class TestTarget(unittest.TestCase):
         """unittest.TestCase.setUp makes pylint cry"""
         # make this independent of the cwd, always relative to our code
         self.test_files_dir = os.path.join(here, "files")
+        mcfg.Mcfg.set_log_level()
 
     def test_empty_edlist(self):
         """empty edlist is the trivial case"""

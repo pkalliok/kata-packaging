@@ -1,0 +1,1 @@
+../../common/36initckandb.sh

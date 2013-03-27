@@ -1,4 +1,5 @@
 #! /bin/bash
+t1=$(date +%s)
 abuilduser=abuild
 abuildkey=~/id_rsa_abuild
 abuildhostdev=abuild
@@ -107,3 +108,6 @@ case $phase in
     echo "usage: $0 [1|2|3]"
     exit 1 ;;
 esac
+set +x
+t2=$(date +%s)
+echo Build duration for phase $phase was $(( (t2 - t1) / 60 )) "minute(s)"

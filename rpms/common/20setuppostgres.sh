@@ -29,6 +29,16 @@ then
   restorecon /opt/data/pgsql/data
   semanage fcontext -a -t var_lib_t "/opt/data/pgsql/backups(/.*)?"
   restorecon /opt/data/pgsql/backups
+  # the following seems to be necessary to work around a bug(?) in 
+  # postgres setup
+  # normally initdb takes care of this, but if the DB directory has been
+  # changed to a non-standard location it does not work. The DB still works
+  # but pgstartup.log will never be written. Better to have the log just in case
+  # something goes wrong
+  touch /opt/data/pgsql/pgstartup.log
+  chown postgres:postgres /opt/data/pgsql/pgstartup.log
+  semanage fcontext -a -t postgresql_db_t /opt/data/pgsql/pgstartup.log
+  restorecon /opt/data/pgsql/pgstartup.log
 fi
 pushd /opt/data/pgsql/data >/dev/null
 datafiles=$(ls | wc -l)
@@ -39,19 +49,27 @@ then
   echo "some database configuration found, don't overwrite it"
   touch /tmp/kata-SKIP-dbinit
   service postgresql start
-  exit 0
 else
   rm -f /tmp/kata-SKIP-dbinit 2>/dev/null
+  service postgresql initdb
+  # su postgres ensures that the resulting file has the correct owner
+  su -c "patch -b -p2 -i ${patchdir}/pg_hba.conf.patch" postgres
+  su -c "patch -b -p2 -i ${patchdir}/postgresql.conf.patch" postgres
+  cp /root/kata-master.ini /opt/data/pgsql
+  su -c "python /usr/share/mcfg/tool/mcfg.py switchuser root postgres" postgres
+  su -c "python /usr/share/mcfg/tool/mcfg.py run /usr/share/mcfg/config/kata-template.ini /opt/data/pgsql/kata-master.ini 20" postgres
+  python /usr/share/mcfg/tool/mcfg.py switchuser postgres root
+  rm /opt/data/pgsql/kata-master.ini
+  # mcfg should really preserve the file mode, but as it doesn't we fix it here
+  chmod og-r /opt/data/pgsql/data/postgresql.conf
+
+  popd >/dev/null
+  service postgresql start
+  chkconfig postgresql on
+  # following command from "postgres createuser -e -S -D -R -P ckanuser"
+  # couldn't find a way to avoid prompting for the password
+  cmd="CREATE ROLE ckanuser PASSWORD 'md5372712b8c6097730c3164ddd4f9275e0' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN"
+  sleep 3    # following psql happened to fail sometimes, wait a moment
+  su -c 'psql -c "'"$cmd"'"' postgres
+  su -c "createdb -O ckanuser ckandb" postgres
 fi
-service postgresql initdb
-# su postgres ensures that the resulting file has the correct owner
-su -c "patch -b -p2 -i ${patchdir}/pg_hba.conf.patch" postgres
-popd >/dev/null
-service postgresql start
-chkconfig postgresql on
-# following command from "postgres createuser -e -S -D -R -P ckanuser"
-# couldn't find a way to avoid prompting for the password
-cmd="CREATE ROLE ckanuser PASSWORD 'md5372712b8c6097730c3164ddd4f9275e0' NOSUPERUSER NOCREATEDB NOCREATEROLE INHERIT LOGIN"
-sleep 3    # following psql happened to fail sometimes, wait a moment 
-su -c 'psql -c "'"$cmd"'"' postgres
-su -c "createdb -O ckanuser ckandb" postgres

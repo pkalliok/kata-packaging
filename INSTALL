@@ -16,6 +16,22 @@ specify complete file names including version numbers in all commands
 given below.)
 
 
+II. General remarks
+
+In order to be able to debug possible installation problems it is useful
+to run critical installation steps inside script. (See script(1))
+
+With a longer lifetime of the installation and possible later upgrades
+in mind it might also be useful to use etckeeper (see
+http://joeyh.name/code/etckeeper/). However, this is the
+administrator's choice, the delivered software does not depend in any
+way on etckeeper. Etckeeper has been used successfully during our
+testing at the customer site. Describing etckeeper usage is beyond the
+scope of this document. However, it can be mentioned that after
+etckeeper installation no manual steps are required related to any
+step described in this document.
+
+
 II. Installation steps
 
 1. Enable EPEL & Shibboleth repos
@@ -50,7 +66,10 @@ II. Installation steps
 
    5.a. Make sure the certificate & key input files referred to by
         /root/kata-master.ini are in place (typically /root/sp-{root,key}.pem)
-   5.b. "sudo yum install kata.rpm"
+   5.b. The next step will produce a lot of output. It is recommend to start
+        a script session now
+   5.c. "sudo yum install kata.rpm"
+   5.d. Terminate the script session if you started one
 
 6. Use kata
 
