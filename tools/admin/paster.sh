@@ -29,9 +29,8 @@ case "$1" in
     echo "                      command is passed as parameter(s)"
     exit
   esac 
-sudo -s -u ckan <<EOF
-cd
-cd pyenv
+sudo -s -u apache <<EOF
+cd /home/ckan/pyenv
 source bin/activate
 cd src/ckan
 paster $cmd
