@@ -8,7 +8,7 @@ I. Packages delivered:
 1. mcfg.rpm  (called the master configuration tool)
 2. apache-solr.rpm
 3. kata-prod.rpm
-4. dummy-deps.rpm
+(4. dummy-deps.rpm)
 
 (rpm files will have version numbers in their names, these have been left
 out in this document for the sake of simplicity. Of course you need to
@@ -43,19 +43,20 @@ II. Installation steps
 2. Install dummy-deps
 
    (This package helps to avoid having packages installed, which are not
-   required on a production server)
+   required on a production server.  It is not required for a functional
+   install.)
 
-   "sudo yum install dummy-deps.rpm"
+   "sudo yum localinstall dummy-deps-<version>.rpm"
 
 
 3. Install Apache solr
 
-   3.a. "sudo yum install apache-solr.rpm"
+   3.a. "sudo yum localinstall apache-solr-<version>.rpm"
 
 
 4. Install master configuration tool
 
-   4.a. "sudo yum install mcfg.rpm"
+   4.a. "sudo yum localinstall mcfg-<version>.rpm"
    4.b. copy the provided master configuration sample file
         "sudo cp -i /usr/share/mcfg/examples/kata-master.ini /root/"
    4.c. Edit it "sudo -e /root/kata-master.ini"
@@ -68,7 +69,7 @@ II. Installation steps
         /root/kata-master.ini are in place (typically /root/sp-{root,key}.pem)
    5.b. The next step will produce a lot of output. It is recommend to start
         a script session now
-   5.c. "sudo yum install kata.rpm"
+   5.c. "sudo yum localinstall kata-ckan-prod-<version>.rpm"
    5.d. Terminate the script session if you started one
 
 6. Use kata
