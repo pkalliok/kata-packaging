@@ -1,5 +1,5 @@
 #! /bin/sh
-# remember: we are not root here (%ckanuser from the spec file)
+# remember: we are not root here (but apache)
 set -x
 if [ -f /tmp/kata-SKIP36 ]
 then

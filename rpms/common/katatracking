@@ -1,3 +1,4 @@
 #!/bin/bash
-
-/home/ckan/pyenv/bin/paster --plugin=ckan tracking update `date --date='yesterday' "+%Y-%m-%d"` --config=/etc/kata.ini > /dev/null 2>&1
+su apache <<'EOF'
+  /home/ckan/pyenv/bin/paster --plugin=ckan tracking update `date --date='yesterday' "+%Y-%m-%d"` --config=/etc/kata.ini
+EOF

@@ -39,7 +39,6 @@ BuildRequires: kata-ckan-dev
 # but the old-style(?) default %{_topdir}/BUILDROOT/... seems to work nicely
 # so we don't clutter yet another place in the directory tree
 
-%define ckanuser ckan
 %define scriptdir %{_datadir}/%{name}/setup-scripts
 %define patchdir %{_datadir}/%{name}/setup-patches
 %define katadocdir %{_datadir}/doc/%{name}
@@ -75,20 +74,20 @@ me=$(whoami)
 # run a dummy sudo first. Two sudo commands in a pipe sometimes screw up
 # the terminal when both prompting for the password
 sudo true
-sudo find /home/%{ckanuser}/pyenv -depth | sudo cpio -pdm --owner ${me}: $RPM_BUILD_ROOT/
+sudo find /home/ckan/pyenv -depth | sudo cpio -pdm --owner ${me}: $RPM_BUILD_ROOT/
 # not sure why, but testings show that the following 2 directories are not
 # owned by ${me}
 sudo chown ${me} $RPM_BUILD_ROOT/home
-sudo chown ${me} $RPM_BUILD_ROOT/home/%{ckanuser}
-find $RPM_BUILD_ROOT/home/%{ckanuser} -name .git -print0 | xargs -0 rm -rf
-find $RPM_BUILD_ROOT/home/%{ckanuser} -name .gitignore -print0 | xargs -0 rm -f
-find $RPM_BUILD_ROOT/home/%{ckanuser} -name .svn -print0 | xargs -0 rm -rf
-find $RPM_BUILD_ROOT/home/%{ckanuser} -name .bzr -print0 | xargs -0 rm -rf
-find $RPM_BUILD_ROOT/home/%{ckanuser} -name .bzrignore -print0 | xargs -0 rm -f
+sudo chown ${me} $RPM_BUILD_ROOT/home/ckan
+find $RPM_BUILD_ROOT/home/ckan -name .git -print0 | xargs -0 rm -rf
+find $RPM_BUILD_ROOT/home/ckan -name .gitignore -print0 | xargs -0 rm -f
+find $RPM_BUILD_ROOT/home/ckan -name .svn -print0 | xargs -0 rm -rf
+find $RPM_BUILD_ROOT/home/ckan -name .bzr -print0 | xargs -0 rm -rf
+find $RPM_BUILD_ROOT/home/ckan -name .bzrignore -print0 | xargs -0 rm -f
 
 # Remove the symlink to orange and actually copy the file over
-rm $RPM_BUILD_ROOT/home/%{ckanuser}/pyenv/lib/python2.6/site-packages/Orange/liborange.so
-cp $RPM_BUILD_ROOT/home/%{ckanuser}/pyenv/lib/python2.6/site-packages/Orange/orange.so $RPM_BUILD_ROOT/home/%{ckanuser}/pyenv/lib/python2.6/site-packages/Orange/liborange.so
+rm $RPM_BUILD_ROOT/home/ckan/pyenv/lib/python2.6/site-packages/Orange/liborange.so
+cp $RPM_BUILD_ROOT/home/ckan/pyenv/lib/python2.6/site-packages/Orange/orange.so $RPM_BUILD_ROOT/home/ckan/pyenv/lib/python2.6/site-packages/Orange/liborange.so
 
 install -d $RPM_BUILD_ROOT/%{scriptdir}
 install -d $RPM_BUILD_ROOT/%{patchdir}
@@ -144,7 +143,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%attr(-,%{ckanuser},%{ckanuser}) /home/%{ckanuser}/pyenv
+%attr(-,apache,apache) /home/ckan/pyenv
 %{scriptdir}/04configuredependencies.sh
 %{scriptdir}/16configshibbolethsp.sh
 %{scriptdir}/20setuppostgres.sh
@@ -180,7 +179,6 @@ rm -rf $RPM_BUILD_ROOT
 %{katadocdir}/pip.freeze.current
 
 %pre
-useradd %{ckanuser}  # needs to be removed if ckanuser were changed to httpd
 
 %post
 %{scriptdir}/04configuredependencies.sh %{patchdir}
@@ -188,17 +186,17 @@ useradd %{ckanuser}  # needs to be removed if ckanuser were changed to httpd
 %{scriptdir}/20setuppostgres.sh %{patchdir}
 %{scriptdir}/22configsolr.sh /home/%{ckanuser} %{patchdir}
 %{scriptdir}/24setupapachessl.sh "/usr/share/kata-ckan-prod"
-%{scriptdir}/32setupckan-root.sh %{ckanuser}
-su -c "%{scriptdir}/36initckandb.sh /home/%{ckanuser}" %{ckanuser}
+%{scriptdir}/32setupckan-root.sh apache
+su -c "%{scriptdir}/36initckandb.sh /home/ckan" apache
 %{scriptdir}/40setupapache.sh %{patchdir}
-su -c "%{scriptdir}/48initextensionsdb.sh /home/%{ckanuser}" %{ckanuser}
+su -c "%{scriptdir}/48initextensionsdb.sh /home/ckan" apache
 
 # Lets do this last so our harvesters are correctly picked up by the daemons.
 cat /usr/share/kata-ckan-prod/setup-scripts/harvester.conf >> /etc/supervisord.conf
 # Enable tmp directory for logging. Otherwise goes to /
 sed -i 's/;directory/directory/' /etc/supervisord.conf
 chkconfig supervisord on
-%{scriptdir}/61setupsources.sh /home/%{ckanuser}
+%{scriptdir}/61setupsources.sh /home/ckan apache
 service atd restart
 at -f %{scriptdir}/runharvester.sh 'now + 3 minute'
 
@@ -220,7 +218,6 @@ service tomcat6 stop
 service postgresql stop
 
 %postun
-userdel -r %{ckanuser}
 
 
 %changelog

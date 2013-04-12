@@ -1,4 +1,5 @@
 # reads ids from a file and inserts them into a DB table called test_ids
+# (should be run as user apache, password based DB access has been removed)
 #
 # Purpose: Comparing contents of Solr index to contents of DB 
 #
@@ -11,7 +12,7 @@ sa = sqlalchemy
 import sys
 
 def main(fn):
-    eng = sa.create_engine( 'postgresql://ckanuser:cKan0001@localhost/ckantest')
+    eng = sa.create_engine( 'postgresql:///ckantest')
     metadata = sa.MetaData()
     test_ids = sa.Table('test_ids', metadata, sa.Column('id', sa.Text))
     metadata.create_all(eng)

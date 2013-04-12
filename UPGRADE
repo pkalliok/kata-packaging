@@ -19,6 +19,8 @@ potential to lead to fatal data loss.
 
 1.) Clear the search index
 
+WIP: current status: skip this step
+
 TODO: currently unclear whether we need this step. There might be
       still changes coming to index updating during production and
       they will have an influence what needs to be done for upgrade.
@@ -43,6 +45,13 @@ to our existing paster script.
 
 $ sudo yum remove mcfg           (this will pull kata-ckan-prod with it)
 
+check whether there a files left in /home/ckan
+
+Take a backup of anything you might have configured or modyfied yourself and
+remove everything (double-check your command, rm -rf as root is a dangerous
+command...)
+
+$ sudo rm -rf /home/ckan
 
 3.) Uninstallation of supervisor
 

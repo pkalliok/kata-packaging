@@ -1,2 +1,4 @@
 #!/bin/bash
-/home/ckan/pyenv/bin/paster --plugin=ckanext-kata katacmd send_request_emails --config=/etc/kata.ini > /dev/null 2>&1
+su apache <<'EOF'
+/home/ckan/pyenv/bin/paster --plugin=ckanext-kata katacmd send_request_emails --config=/etc/kata.ini
+EOF

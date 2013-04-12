@@ -36,7 +36,6 @@ Conflicts: kata-ckan-prod
 # but the old-style(?) default %{_topdir}/BUILDROOT/... seems to work nicely
 # so we don't clutter yet another place in the directory tree
 
-%define ckanuser ckan
 %define scriptdir %{_datadir}/%{name}/setup-scripts
 %define patchdir %{_datadir}/%{name}/setup-patches
 %define katadatadir %{_datadir}/%{name}/setup-data
@@ -94,7 +93,6 @@ install 48initextensionsdb.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 61setupsources.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 70checkpythonpackages.sh $RPM_BUILD_ROOT/%{scriptdir}/
 install 71storepythonpackages.sh $RPM_BUILD_ROOT/%{scriptdir}/
-install 80backuphome.sh $RPM_BUILD_ROOT/%{scriptdir}/
 
 # misc scripts (keep them alphabetically ordered by filename)
 install runharvester.sh $RPM_BUILD_ROOT/%{katadatadir}/
@@ -146,7 +144,6 @@ rm -rf $RPM_BUILD_ROOT
 %{scriptdir}/61setupsources.sh
 %{scriptdir}/70checkpythonpackages.sh
 %{scriptdir}/71storepythonpackages.sh
-%{scriptdir}/80backuphome.sh
 
 # sic! following script in datadir
 %{katadatadir}/runharvester.sh
@@ -172,15 +169,14 @@ rm -rf $RPM_BUILD_ROOT
 /etc/sysconfig/pgsql/postgresql
 
 %post
-useradd %{ckanuser}  # would need to be removed if ckanuser were changed to httpd
 %{scriptdir}/04configuredependencies.sh %{patchdir}
-su -c "%{scriptdir}/08getpyenv.sh /home/%{ckanuser}" %{ckanuser}
-su -c "%{scriptdir}/12getpythonpackages.sh /home/%{ckanuser}" %{ckanuser}
+su -c "%{scriptdir}/08getpyenv.sh /home/ckan" apache
+su -c "%{scriptdir}/12getpythonpackages.sh /home/ckan" apache
 %{scriptdir}/16configshibbolethsp.sh "/usr/share/kata-ckan-dev"
 %{scriptdir}/20setuppostgres.sh %{patchdir}
 %{scriptdir}/22configsolr.sh /home/%{ckanuser} %{patchdir}
 %{scriptdir}/24setupapachessl.sh "/usr/share/kata-ckan-dev"
-cat > /home/%{ckanuser}/pyenv/bin/wsgi.py <<EOF
+cat > /home/ckan/pyenv/bin/wsgi.py <<EOF
 import os
 instance_dir = '/home/ckan'
 config_file = '/etc/kata.ini'
@@ -193,12 +189,12 @@ from paste.script.util.logging_config import fileConfig
 fileConfig(config_filepath)
 application = loadapp('config:%s' % config_filepath)
 EOF
-chmod 777 /home/%{ckanuser}/pyenv/bin/wsgi.py
-su -c "%{scriptdir}/28setupckan.sh /home/%{ckanuser}" %{ckanuser}
-%{scriptdir}/32setupckan-root.sh %{ckanuser}
-su -c "%{scriptdir}/36initckandb.sh /home/%{ckanuser}" %{ckanuser}
+chmod 777 /home/ckan/pyenv/bin/wsgi.py
+su -c "%{scriptdir}/28setupckan.sh /home/ckan" apache
+%{scriptdir}/32setupckan-root.sh apache
+su -c "%{scriptdir}/36initckandb.sh /home/ckan" apache
 %{scriptdir}/40setupapache.sh %{patchdir}
-su -c "%{scriptdir}/44installckanextensions.sh /home/%{ckanuser}" %{ckanuser}
+su -c "%{scriptdir}/44installckanextensions.sh /home/ckan" apache
 # no need to call 48initextensionsdb.sh here, previous script does it because
 # it needs in in the middle
 # Let's configure supervisor now, so our harvesters are correctly picked up by
@@ -206,7 +202,7 @@ su -c "%{scriptdir}/44installckanextensions.sh /home/%{ckanuser}" %{ckanuser}
 cat /usr/share/kata-ckan-dev/setup-data/harvester.conf >> /etc/supervisord.conf
 # Enable tmp directory for logging. Otherwise goes to /
 sed -i 's/;directory/directory/' /etc/supervisord.conf
-%{scriptdir}/61setupsources.sh /home/%{ckanuser}
+%{scriptdir}/61setupsources.sh /home/ckan apache
 service atd restart
 at -f %{katadatadir}/runharvester.sh 'now + 3 minute'
 
@@ -215,15 +211,12 @@ service httpd start
 service supervisord start
 service crond start
 # run this last so the user has a chance to see the output
-su -c "%{scriptdir}/70checkpythonpackages.sh /home/%{ckanuser} %{katadatadir}/pip.freeze.lastknown" %{ckanuser}
+su -c "%{scriptdir}/70checkpythonpackages.sh /home/ckan %{katadatadir}/pip.freeze.lastknown" apache
 # well, actually it was last but one, but we still need to do this as root
 # afterwards
 %{scriptdir}/71storepythonpackages.sh %{katadatadir}
 
 %preun
-service ckan-dev stop
-%{scriptdir}/80backuphome.sh /home/%{ckanuser}
-
 
 %postun
 echo "Uninstallation not fully supported yet, better get a clean VM to be sure"
